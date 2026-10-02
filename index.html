@@ -26,11 +26,11 @@
         <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
       </div>
 
-      <!-- Authenticated Profile State (Default-ஆ உங்க பெயர் இல்லாமல் User-னு மாற்றப்பட்டுள்ளது) -->
+      <!-- Authenticated Profile State with Welcome Greeting -->
       <div class="user-profile hidden" id="userProfileContainer">
         <div class="profile-info">
           <i class="fa-solid fa-circle-user profile-icon"></i>
-          <span id="userNameDisplay">User</span>
+          <span>Hi, Welcome <strong id="userNameDisplay">User</strong>!</span>
         </div>
         <button class="btn btn-outline btn-sm" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </div>
@@ -45,7 +45,7 @@
         <p>Make smarter financial decisions with personalized recommendations for home interiors, party setups, and jewelry purchases within your budget constraints.</p>
         <div class="hero-actions">
           <button class="btn btn-primary btn-lg" onclick="showTab('planners')">Explore Planners</button>
-          <button class="btn btn-outline btn-lg" onclick="showTab('testimonials')">Learn More</button>
+          <button class="btn btn-outline-light btn-lg" onclick="showTab('testimonials')">Learn More</button>
         </div>
       </div>
     </header>
@@ -166,7 +166,7 @@
     </div>
   </section>
 
-  <!-- Authentication Modals (காலியான Input Fields & Placeholders) -->
+  <!-- Authentication Modals -->
   <div id="loginModal" class="modal hidden">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
