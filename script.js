@@ -166,7 +166,7 @@ function displayLoading() {
 
 function renderOutput(result) {
   const content = document.getElementById('outputContent');
-  let html = `<h4><i class="fa-solid fa-circle-check" style="color: #16a34a;"></i> Recommendations for ${result.domain || 'Budget Plan'}</h4>`;
+  let html = `<h4><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Recommendations for ${result.domain || 'Budget Plan'}</h4>`;
 
   if (result.data && result.data.budget_breakdown) {
     result.data.budget_breakdown.forEach(item => {
@@ -213,39 +213,38 @@ function renderHistory() {
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-// Handle Dynamic Login (No hardcoded username or email)
+// Handle Dynamic Login
 function handleLogin(e) {
   e.preventDefault();
   const emailInput = document.getElementById('loginEmail').value;
-  // Dynamic extraction: user123@gmail.com -> user123
-  const extractedName = emailInput ? emailInput.split('@')[0] : "User";
+  const rawName = emailInput ? emailInput.split('@')[0] : "User";
+  const formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
   
-  localStorage.setItem("pocketSmartUser", extractedName);
-  updateUserUI(extractedName);
+  localStorage.setItem("pocketSmartUser", formattedName);
+  updateUserUI(formattedName);
   
-  // Clear input fields on login
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
   closeModal('loginModal');
 }
 
-// Handle Dynamic Registration (No hardcoded fallback names)
+// Handle Dynamic Registration
 function handleRegister(e) {
   e.preventDefault();
   const nameInput = document.getElementById('regName').value;
-  const userName = nameInput.trim() ? nameInput : "User";
+  const rawName = nameInput.trim() ? nameInput : "User";
+  const formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
   
-  localStorage.setItem("pocketSmartUser", userName);
-  updateUserUI(userName);
+  localStorage.setItem("pocketSmartUser", formattedName);
+  updateUserUI(formattedName);
   
-  // Clear input fields on registration
   document.getElementById('regName').value = '';
   document.getElementById('regEmail').value = '';
   document.getElementById('regPassword').value = '';
   closeModal('registerModal');
 }
 
-// Update UI based on User Profile
+// Update UI based on User Profile with Greeting
 function updateUserUI(userName) {
   document.getElementById('authContainer').classList.add('hidden');
   const userProfile = document.getElementById('userProfileContainer');
