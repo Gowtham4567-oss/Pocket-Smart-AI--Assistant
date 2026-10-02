@@ -1,127 +1,216 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, List
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PocketSmart AI - Smart Budget & Recommendation Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
-app = FastAPI(title="PocketSmart AI API", version="1.0.0")
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo"><i class="fa-solid fa-wallet"></i> PocketSmart <span>AI</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" onclick="showTab('home')">Home</a></li>
+        <li><a href="#planners" onclick="showTab('planners')">Planners</a></li>
+        <li><a href="#history" onclick="showTab('history')">History</a></li>
+        <li><a href="#testimonials" onclick="showTab('testimonials')">Testimonials</a></li>
+      </ul>
+      
+      <!-- Unauthenticated State -->
+      <div class="auth-buttons" id="authContainer">
+        <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+        <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+      </div>
 
-# CORS Setup - Frontend connect aaga
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # GitHub Pages matrum local testings ku allow pannum
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+      <!-- Authenticated Profile State with Welcome Greeting -->
+      <div class="user-profile hidden" id="userProfileContainer">
+        <div class="profile-info">
+          <i class="fa-solid fa-circle-user profile-icon"></i>
+          <span>Hi, Welcome <strong id="userNameDisplay">User</strong>!</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
 
-# Request Models
-class HomeDecorRequest(BaseModel):
-    budget: float
-    num_lights: Optional[int] = 0
-    num_fans: Optional[int] = 0
-    num_furniture: Optional[int] = 0
-    notes: Optional[str] = ""
+  <!-- Hero / Home Section -->
+  <section id="home" class="tab-content active">
+    <header class="hero">
+      <div class="hero-content">
+        <h1>AI-Powered Budget Planning for Everyday Needs</h1>
+        <p>Make smarter financial decisions with personalized recommendations for home interiors, party setups, and jewelry purchases within your budget constraints.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="showTab('planners')">Explore Planners</button>
+          <button class="btn btn-outline-light btn-lg" onclick="showTab('testimonials')">Learn More</button>
+        </div>
+      </div>
+    </header>
+  </section>
 
-class PartyRequest(BaseModel):
-    event_type: str
-    budget: float
-    guest_count: int
-    notes: Optional[str] = ""
+  <!-- Planners Section -->
+  <section id="planners" class="tab-content container">
+    <h2 class="section-title">Our Smart Budget Planners</h2>
+    <p class="section-subtitle">Select a planner below to generate optimized AI spending breakdowns.</p>
 
-class JewelryRequest(BaseModel):
-    budget: float
-    notes: str
+    <div class="planner-grid">
+      <!-- Home Decor Card -->
+      <div class="planner-card">
+        <i class="fa-solid fa-house-laptop card-icon"></i>
+        <h3>Home Interior Planner</h3>
+        <p>Recommendations for furniture, lights, and appliances tailored to your room count and budget constraints.</p>
+        <button class="btn btn-primary" onclick="selectPlanner('homeDecor')">Open Planner</button>
+      </div>
 
-# Endpoints
-@app.get("/")
-def read_root():
-    return {"message": "PocketSmart AI Backend is Running Successfully!"}
+      <!-- Party Budget Card -->
+      <div class="planner-card">
+        <i class="fa-solid fa-champagne-glasses card-icon"></i>
+        <h3>Party Budget Planner</h3>
+        <p>Plan catering, venue allocations, and decor for events staying strictly within your financial limit.</p>
+        <button class="btn btn-primary" onclick="selectPlanner('party')">Open Planner</button>
+      </div>
 
-@app.post("/recommend/home-decor")
-def recommend_home_decor(req: HomeDecorRequest):
-    try:
-        total = req.budget
-        breakdown = [
-            {
-                "category": f"Lighting Setup ({req.num_lights} Lights)",
-                "allocated_amount": round(total * 0.25, 2),
-                "items": ["Smart LED Bulbs & Warm White Strips"]
-            },
-            {
-                "category": f"Fans & Airflow ({req.num_fans} Fans)",
-                "allocated_amount": round(total * 0.35, 2),
-                "items": ["BLDC Energy Saving Ceiling Fans"]
-            },
-            {
-                "category": f"Furniture Essentials ({req.num_furniture} Items)",
-                "allocated_amount": round(total * 0.40, 2),
-                "items": ["Minimalist Wooden Furniture Essentials"]
-            }
-        ]
-        return {
-            "status": "success",
-            "domain": "Home Interior",
-            "data": {
-                "total_budget": total,
-                "budget_breakdown": breakdown
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+      <!-- Jewelry Planner Card -->
+      <div class="planner-card">
+        <i class="fa-solid fa-gem card-icon"></i>
+        <h3>Jewelry Budget Planner</h3>
+        <p>Match your outfit styles, occasions, and price limits with curated jewelry recommendations.</p>
+        <button class="btn btn-primary" onclick="selectPlanner('jewelry')">Open Planner</button>
+      </div>
+    </div>
 
-@app.post("/recommend/party")
-def recommend_party(req: PartyRequest):
-    try:
-        total = req.budget
-        breakdown = [
-            {
-                "category": "Catering & Refreshments",
-                "allocated_amount": round(total * 0.55, 2),
-                "items": [f"Buffet meals for {req.guest_count} guests"]
-            },
-            {
-                "category": "Venue & Decoration",
-                "allocated_amount": round(total * 0.30, 2),
-                "items": ["Theme Balloon Arch & Sound Setup"]
-            },
-            {
-                "category": "Cake & Return Gifts",
-                "allocated_amount": round(total * 0.15, 2),
-                "items": ["Custom Birthday Cake & Gift Favors"]
-            }
-        ]
-        return {
-            "status": "success",
-            "domain": "Party Package",
-            "data": {
-                "event_type": req.event_type,
-                "guest_count": req.guest_count,
-                "budget_breakdown": breakdown
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    <!-- Active Form Container -->
+    <div id="plannerForms" class="form-container hidden">
+      <!-- Home Decor Form -->
+      <form id="homeDecorForm" class="planner-form hidden" onsubmit="handleHomeDecorSubmit(event)">
+        <h3><i class="fa-solid fa-house"></i> Home Interior Budget Form</h3>
+        <div class="form-group">
+          <label>Total Budget (₹)</label>
+          <input type="number" id="homeBudget" required placeholder="e.g. 10000" value="10000">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Lights</label><input type="number" id="numLights" value="5" min="0"></div>
+          <div class="form-group"><label>Fans</label><input type="number" id="numFans" value="3" min="0"></div>
+          <div class="form-group"><label>Furniture</label><input type="number" id="numFurniture" value="2" min="0"></div>
+        </div>
+        <div class="form-group">
+          <label>Additional Requirements</label>
+          <textarea id="homeNotes" rows="3" placeholder="e.g. Minimalist design, wooden finish from IKEA or Amazon"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Generate Home Recommendations</button>
+      </form>
 
-@app.post("/recommend/jewelry")
-def recommend_jewelry(req: JewelryRequest):
-    try:
-        total = req.budget
-        recommendations = [
-            f"Curated Antique Gold Finish Matching Set under ₹{total}",
-            "Recommended Brands: CaratLane, Tanishq, and Fine Jewelry collections",
-            "Set includes: Matching Neckpiece, Earrings, and Bangles"
-        ]
-        return {
-            "status": "success",
-            "domain": "Jewelry Stylist",
-            "data": {
-                "total_budget": total,
-                "recommendations": recommendations
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+      <!-- Party Form -->
+      <form id="partyForm" class="planner-form hidden" onsubmit="handlePartySubmit(event)">
+        <h3><i class="fa-solid fa-cake-candles"></i> Party Package Budget Form</h3>
+        <div class="form-group">
+          <label>Event Type</label>
+          <input type="text" id="eventType" required placeholder="e.g. Birthday Celebration" value="Birthday Celebration">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Total Budget (₹)</label><input type="number" id="partyBudget" required placeholder="45000" value="45000"></div>
+          <div class="form-group"><label>Guest Count</label><input type="number" id="guestCount" required placeholder="35" value="35"></div>
+        </div>
+        <div class="form-group">
+          <label>Additional Requirements</label>
+          <textarea id="partyNotes" rows="3" placeholder="e.g. Buffet catering, balloon theme"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Generate Party Recommendations</button>
+      </form>
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+      <!-- Jewelry Form -->
+      <form id="jewelryForm" class="planner-form hidden" onsubmit="handleJewelrySubmit(event)">
+        <h3><i class="fa-solid fa-gem"></i> Jewelry Stylist Form</h3>
+        <div class="form-group">
+          <label>Budget Limit (₹)</label>
+          <input type="number" id="jewelryBudget" required placeholder="35000" value="35000">
+        </div>
+        <div class="form-group">
+          <label>Outfit Style & Occasion</label>
+          <textarea id="jewelryNotes" rows="3" required placeholder="e.g. South Indian Silk Saree matching set, Antique Gold finish"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Generate Styling Suggestions</button>
+      </form>
+
+      <!-- Output Results Box -->
+      <div id="recommendationOutput" class="output-box hidden">
+        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> AI Recommendation Breakdown</h3>
+        <div id="outputContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- History Section -->
+  <section id="history" class="tab-content container hidden">
+    <h2 class="section-title">Saved Recommendation History</h2>
+    <div id="historyList" class="history-grid">
+      <p>No previous searches recorded yet.</p>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="tab-content container hidden">
+    <h2 class="section-title">User Reviews & Success Stories</h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p>"PocketSmart AI helped me furnish my room within ₹10,000 without missing any essentials."</p>
+        <h4>- Ananya Sharma</h4>
+      </div>
+      <div class="testimonial-card">
+        <p>"Organizing my sister's birthday was effortless. The Swiggy and venue breakdown matched our exact budget."</p>
+        <h4>- Rajesh Kumar</h4>
+      </div>
+    </div>
+  </section>
+
+  <!-- Authentication Modals -->
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+      <h2>Login to PocketSmart AI</h2>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter your password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
+      <h2>Create an Account</h2>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" required placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" required placeholder="Create a password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 PocketSmart AI. Built for Smart Financial Planning.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
